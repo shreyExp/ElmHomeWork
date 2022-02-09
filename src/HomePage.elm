@@ -29,6 +29,8 @@ initialModel =
     ]
 
 -- type Msg = Clicked String| NotClicked String
+-- type Event = optionButtonClicked | optionSelectClicked
+-- type alias Msg = {event: Event, category: Category, option: Option}
 type alias Msg = {name: String}
 update : Msg -> Model -> Model
 update msg model =
@@ -46,7 +48,7 @@ makeText status =
     if status then
         ""
     else
-        "Hello"
+        ""
         
 
 
@@ -66,20 +68,32 @@ makeOption num = Option False ("Option " ++ (String.fromInt num))
 
 level_1 model = div [class "level_1_container"] (List.map makeCategory model)
 
-makeCategory x =
+makeCategory : Category -> Html Msg
+makeCategory category =
         div divStyle [ 
-                         h1 [] [text x.name]
-                        ,button [onClick (Msg x.name)] [text "Options"]
-                        ,div [] (showOptions x.options)
-                        ,p [] [text x.text]
+                         h1 [] [text category.name]
+                        ,button [onClick (Msg category.name)] [text "Options"]
+                        --,div dropDownStyle (showOptions category.dropdownStatus category.options)
+                        ,makeDropdown category
+                        ,p [] [text category.text]
 
                      ]
+dropDownStyle = [relativePosition_style, onTop_style, white_style, dropdown_width_style, border_style, dropdown_scroll_style, dropdown_height_style]
+showOptions : Bool -> Options -> List (Html Msg)
+showOptions dropdownStatus option_s =
+    if dropdownStatus then
+        List.map makeParagraphFromOption option_s
+    else
+        []
 
--- showOptions : Options -> List Html.html
-showOptions option_s =
-    List.map makeParagraphFromOption option_s
+makeDropdown : Category -> Html Msg
+makeDropdown category =
+    if category.dropdownStatus then
+        div dropDownStyle (showOptions category.dropdownStatus category.options)
+    else
+        div [] []
 
--- makeParagraphFromOption : Option -> Html.html
+makeParagraphFromOption : Option -> Html Msg
 makeParagraphFromOption option =
     p [] [text option.text]
 
@@ -91,9 +105,15 @@ margin_bottom_style = style "margin-bottom" "30px"
 border_style = style "border" "solid 1px"
 half_width_style = style "width" "49%"
 inline_style = style "display" "inline-block"
-red_style = style "background-color" "red"
+red_style = style "background-color" "blue"
+white_style = style "background-color" "white"
 green_style = style "color" "green"
 height_style = style "height" "200px"
+onTop_style = style "z-index" "10"
+relativePosition_style = style "position" "relative"
+dropdown_width_style = style "width" "100px"
+dropdown_height_style = style "height" "50%"
+dropdown_scroll_style = style "overflow-y" "scroll"
 
 paragraph = p []
     [ text "Hi How are you doing"]
