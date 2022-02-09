@@ -50,8 +50,6 @@ makeText status =
     else
         ""
         
-
-
 type alias Option = {status: Bool, text: String}
 type alias Options = List Option
 type alias Category = {name: String, dropdownStatus: Bool, options: Options, text: String}
@@ -79,6 +77,7 @@ makeCategory category =
 
                      ]
 dropDownStyle = [relativePosition_style, onTop_style, white_style, dropdown_width_style, border_style, dropdown_scroll_style, dropdown_height_style]
+
 showOptions : Bool -> Options -> List (Html Msg)
 showOptions dropdownStatus option_s =
     if dropdownStatus then
