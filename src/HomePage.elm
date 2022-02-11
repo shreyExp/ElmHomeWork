@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import Browser
 
 
-main = 
+main =
     Browser.sandbox
     {
          init = initialModel
@@ -15,8 +15,8 @@ main =
     }
 
 -- put the super container in the model
-view model =
-    level_1 model
+--view model =
+ --   level_1 model
 
 type alias Model = List Category
 initialModel : Model
@@ -28,20 +28,38 @@ initialModel =
         categoryFour
     ]
 
--- type Msg = Clicked String| NotClicked String
--- type Event = optionButtonClicked | optionSelectClicked
--- type alias Msg = {event: Event, category: Category, option: Option}
-type alias Msg = {name: String}
+type Msg = OptionButtonClicked Category | OptionSelectClicked Category Option | ClickedOutside
 update : Msg -> Model -> Model
 update msg model =
     List.map (respond msg) model
 
 respond : Msg -> Category -> Category
 respond msg cat =
-    if msg.name == cat.name then
-        Category cat.name (not cat.dropdownStatus) cat.options (makeText cat.dropdownStatus)
+    case msg of
+        ClickedOutside ->
+            cat
+        OptionButtonClicked category ->
+            if cat.name == category.name then
+                {cat | dropdownStatus = not cat.dropdownStatus}
+            else
+                cat
+        OptionSelectClicked category option ->
+            if cat.name == category.name then
+                {cat | options = (changeStateOfOptions option cat.options)}
+            else
+                cat
+
+
+changeStateOfOptions : Option -> Options -> Options
+changeStateOfOptions option option_s =
+    List.map (changeStateOfOption option) option_s
+
+changeStateOfOption : Option -> Option -> Option
+changeStateOfOption optionSelected option =
+    if optionSelected.text == option.text then
+        {option | status = not option.status}
     else
-        cat
+        option
 
 makeText : Bool -> String
 makeText status =
@@ -49,7 +67,7 @@ makeText status =
         ""
     else
         ""
-        
+
 type alias Option = {status: Bool, text: String}
 type alias Options = List Option
 type alias Category = {name: String, dropdownStatus: Bool, options: Options, text: String}
@@ -64,37 +82,52 @@ options = List.map makeOption (List.range 1 10)
 makeOption : Int -> Option
 makeOption num = Option False ("Option " ++ (String.fromInt num))
 
-level_1 model = div [class "level_1_container"] (List.map makeCategory model)
+view model = div [class "level_1_container", onClick (ClickedOutside)] (List.map makeCategory model)
 
 makeCategory : Category -> Html Msg
 makeCategory category =
-        div divStyle [ 
+        div divStyle [
                          h1 [] [text category.name]
-                        ,button [onClick (Msg category.name)] [text "Options"]
+                        -- Maybe implement here what the category paragraph must contain
+                        -- ,p [] [text category.text]
+                        ,p [] [text (showSelectedOptions category.options)]
+                        ,button [onClick (OptionButtonClicked category)] [text "Options"]
                         --,div dropDownStyle (showOptions category.dropdownStatus category.options)
                         ,makeDropdown category
-                        ,p [] [text category.text]
 
                      ]
+showSelectedOptions : Options -> String
+showSelectedOptions option_s =
+    String.join ", " (List.map (\option -> option.text) (List.filter (\option -> option.status) option_s))
 dropDownStyle = [relativePosition_style, onTop_style, white_style, dropdown_width_style, border_style, dropdown_scroll_style, dropdown_height_style]
 
-showOptions : Bool -> Options -> List (Html Msg)
-showOptions dropdownStatus option_s =
-    if dropdownStatus then
-        List.map makeParagraphFromOption option_s
+
+showOptions : Category -> List (Html Msg)
+showOptions category =
+    if category.dropdownStatus then
+        List.map (makeParagraphFromOption category) category.options
     else
         []
 
 makeDropdown : Category -> Html Msg
 makeDropdown category =
     if category.dropdownStatus then
-        div dropDownStyle (showOptions category.dropdownStatus category.options)
+        div dropDownStyle (showOptions category)
     else
         div [] []
 
-makeParagraphFromOption : Option -> Html Msg
-makeParagraphFromOption option =
-    p [] [text option.text]
+makeParagraphFromOption : Category -> Option -> Html Msg
+makeParagraphFromOption category option =
+    p [onClick (OptionSelectClicked category option), optionColor option.status] [text option.text]
+
+optionColor : Bool -> (Html.Attribute msg)
+optionColor status =
+    if status then
+        style "background-color" "blue"
+    else
+        style "background-color" "white"
+
+
 
 divStyle = [margin_style, border_style, height_style]
 
