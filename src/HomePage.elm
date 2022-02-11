@@ -14,9 +14,6 @@ main =
         ,update = update
     }
 
--- put the super container in the model
---view model =
- --   level_1 model
 
 type alias Model = List Category
 initialModel : Model
@@ -87,21 +84,33 @@ view model = div [class "level_1_container", onClick (ClickedOutside)] (List.map
 makeCategory : Category -> Html Msg
 makeCategory category =
         div divStyle [
-                         h1 [] [text category.name]
-                        -- Maybe implement here what the category paragraph must contain
-                        -- ,p [] [text category.text]
-                        ,p [] [text (showSelectedOptions category.options)]
-                        ,button [onClick (OptionButtonClicked category)] [text "Options"]
-                        --,div dropDownStyle (showOptions category.dropdownStatus category.options)
-                        ,makeDropdown category
-
+                        contentSection category
+                        ,optionsSection category
                      ]
+
+contentSection : Category -> Html Msg
+contentSection category =
+    div contentSectionStyle [
+                            h1 [] [text category.name]
+                            ,p [] [text (showSelectedOptions category.options)]
+                            ]
+
+optionsSection : Category -> Html Msg
+optionsSection category =
+    div optionsSectionStyle [optionsButton category, makeDropdown category]
+
+optionsButton : Category -> Html Msg
+optionsButton category =
+    button [onClick (OptionButtonClicked category)] [text "Options"]
+
 showSelectedOptions : Options -> String
 showSelectedOptions option_s =
     String.join ", " (List.map (\option -> option.text) (List.filter (\option -> option.status) option_s))
+
 dropDownStyle = [relativePosition_style, onTop_style, white_style, dropdown_width_style, border_style, dropdown_scroll_style, dropdown_height_style]
-
-
+optionsSectionStyle = [inline_style, white_style, optionsSection_width_style, optionsSection_height_style, border_style]
+--optionsSectionStyle = [inline_style, white_style, optionsSection_height_style, border_style]
+contentSectionStyle = [inline_style, white_style, contentSection_width_style, contentSection_height_style, border_style]
 showOptions : Category -> List (Html Msg)
 showOptions category =
     if category.dropdownStatus then
@@ -114,7 +123,8 @@ makeDropdown category =
     if category.dropdownStatus then
         div dropDownStyle (showOptions category)
     else
-        div [] []
+        --div [] []
+        div dropDownStyle []
 
 makeParagraphFromOption : Category -> Option -> Html Msg
 makeParagraphFromOption category option =
@@ -127,10 +137,7 @@ optionColor status =
     else
         style "background-color" "white"
 
-
-
 divStyle = [margin_style, border_style, height_style]
-
 
 margin_style = style "margin" "5px"
 margin_bottom_style = style "margin-bottom" "30px"
@@ -139,13 +146,14 @@ half_width_style = style "width" "49%"
 inline_style = style "display" "inline-block"
 red_style = style "background-color" "blue"
 white_style = style "background-color" "white"
-green_style = style "color" "green"
 height_style = style "height" "200px"
 onTop_style = style "z-index" "10"
 relativePosition_style = style "position" "relative"
-dropdown_width_style = style "width" "100px"
-dropdown_height_style = style "height" "50%"
+--dropdown_width_style = style "width" "100px"
+dropdown_width_style = style "width" "90%"
+dropdown_height_style = style "height" "80%"
 dropdown_scroll_style = style "overflow-y" "scroll"
-
-paragraph = p []
-    [ text "Hi How are you doing"]
+optionsSection_width_style = style "width" "12%"
+contentSection_width_style = style "width" "87%"
+contentSection_height_style = style "height" "100%"
+optionsSection_height_style = style "height" "100%"
