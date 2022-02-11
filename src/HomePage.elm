@@ -137,9 +137,10 @@ optionColor status =
     else
         style "background-color" "white"
 
-divStyle = [margin_style, border_style, height_style]
+--divStyle = [margin_style, border_style, height_style]
+divStyle = [border_style, height_style]
 
-margin_style = style "margin" "5px"
+--margin_style = style "margin" "5px"
 margin_bottom_style = style "margin-bottom" "30px"
 border_style = style "border" "solid 1px"
 half_width_style = style "width" "49%"
