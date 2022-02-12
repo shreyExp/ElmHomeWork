@@ -107,10 +107,9 @@ showSelectedOptions : Options -> String
 showSelectedOptions option_s =
     String.join ", " (List.map (\option -> option.text) (List.filter (\option -> option.status) option_s))
 
-dropDownStyle = [relativePosition_style, onTop_style, white_style, dropdown_width_style, border_style, dropdown_scroll_style, dropdown_height_style]
-optionsSectionStyle = [inline_style, white_style, optionsSection_width_style, optionsSection_height_style, border_style]
---optionsSectionStyle = [inline_style, white_style, optionsSection_height_style, border_style]
-contentSectionStyle = [inline_style, white_style, contentSection_width_style, contentSection_height_style, border_style]
+dropDownStyle = [border_style, white_style, dropdown_width_style, dropdown_scroll_style, dropdown_height_style]
+optionsSectionStyle = [optionsSection_width_style, floatRight_style, optionsSection_height_style]
+contentSectionStyle = [contentSection_width_style, floatLeft_style, verticalAlign]
 showOptions : Category -> List (Html Msg)
 showOptions category =
     if category.dropdownStatus then
@@ -123,8 +122,8 @@ makeDropdown category =
     if category.dropdownStatus then
         div dropDownStyle (showOptions category)
     else
-        --div [] []
-        div dropDownStyle []
+        div [] []
+        --div dropDownStyle []
 
 makeParagraphFromOption : Category -> Option -> Html Msg
 makeParagraphFromOption category option =
@@ -137,10 +136,10 @@ optionColor status =
     else
         style "background-color" "white"
 
---divStyle = [margin_style, border_style, height_style]
-divStyle = [border_style, height_style]
+divStyle = [border_style, height_style, displayGrid_style]
 
---margin_style = style "margin" "5px"
+displayGrid_style = style "display" "grid | inline-grid"
+
 margin_bottom_style = style "margin-bottom" "30px"
 border_style = style "border" "solid 1px"
 half_width_style = style "width" "49%"
@@ -150,11 +149,14 @@ white_style = style "background-color" "white"
 height_style = style "height" "200px"
 onTop_style = style "z-index" "10"
 relativePosition_style = style "position" "relative"
---dropdown_width_style = style "width" "100px"
-dropdown_width_style = style "width" "90%"
+dropdown_width_style = style "width" "100%"
 dropdown_height_style = style "height" "80%"
 dropdown_scroll_style = style "overflow-y" "scroll"
 optionsSection_width_style = style "width" "12%"
 contentSection_width_style = style "width" "87%"
 contentSection_height_style = style "height" "100%"
 optionsSection_height_style = style "height" "100%"
+floatTop_style = style "float" "top"
+floatRight_style = style "float" "right"
+floatLeft_style = style "float" "left"
+verticalAlign = style "veritcal-align" "top"
