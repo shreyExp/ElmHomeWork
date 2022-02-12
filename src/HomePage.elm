@@ -69,10 +69,10 @@ type alias Option = {status: Bool, text: String}
 type alias Options = List Option
 type alias Category = {name: String, dropdownStatus: Bool, options: Options, text: String}
 
-categoryOne = Category "CategoryOne" False options ""
-categoryTwo = Category "CategoryTwo" False options ""
-categoryThree = Category "CategoryThree" False options ""
-categoryFour = Category "CategoryFour" False options ""
+categoryOne = Category "Overall" False options ""
+categoryTwo = Category "Category 1" False options ""
+categoryThree = Category "Category 2" False options ""
+categoryFour = Category "Category 3" False options ""
 
 options : Options
 options = List.map makeOption (List.range 1 10)
@@ -101,13 +101,19 @@ optionsSection category =
 
 optionsButton : Category -> Html Msg
 optionsButton category =
-    button [onClick (OptionButtonClicked category)] [text "Options"]
+    -- button [onClick (OptionButtonClicked category)] [text "Compare"]
+    div [onClick (OptionButtonClicked category), roundBorder_style, margin_style, grayColor] [text "Compare"]
+
+grayColor = style "background-color" "#999999"
+shadowStyle = style "box-shadow" "3px 3px 3px 3px  #888888"
+
 
 showSelectedOptions : Options -> String
 showSelectedOptions option_s =
     String.join ", " (List.map (\option -> option.text) (List.filter (\option -> option.status) option_s))
 
-dropDownStyle = [border_style, white_style, dropdown_width_style, dropdown_scroll_style, dropdown_height_style]
+-- dropdown
+dropDownStyle = [white_style, dropdown_width_style, dropdown_scroll_style, dropdown_height_style, relativePosition_style, onTop_style, shadowStyle]
 optionsSectionStyle = [optionsSection_width_style, floatRight_style, optionsSection_height_style]
 contentSectionStyle = [contentSection_width_style, floatLeft_style, verticalAlign]
 showOptions : Category -> List (Html Msg)
@@ -136,11 +142,13 @@ optionColor status =
     else
         style "background-color" "white"
 
-divStyle = [border_style, height_style, displayGrid_style]
+divStyle = [border_style, height_style, displayGrid_style, roundBorder_style]
 
 displayGrid_style = style "display" "grid | inline-grid"
+roundBorder_style = style "border-radius" "20px"
 
 margin_bottom_style = style "margin-bottom" "30px"
+margin_style = style "margin" "10px"
 border_style = style "border" "solid 1px"
 half_width_style = style "width" "49%"
 inline_style = style "display" "inline-block"
