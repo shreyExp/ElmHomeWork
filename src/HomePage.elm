@@ -15,20 +15,20 @@ main =
     }
 
 
-type alias Model = List Category
+type Model = Struc {category: Category, otherCategories: Model} | Categories (List Category)
+lastTwoCagories = Categories [categoryTwo, categoryThree]
+bottomCategories = Struc {category = categoryOne, otherCategories = lastTwoCagories}
 initialModel : Model
-initialModel =
-    [
-        categoryOne,
-        categoryTwo,
-        categoryThree,
-        categoryFour
-    ]
+initialModel = Struc {category = categoryOverAll, otherCategories = bottomCategories}
 
 type Msg = OptionButtonClicked Category | OptionSelectClicked Category Option | ClickedOutside
 update : Msg -> Model -> Model
 update msg model =
-    List.map (respond msg) model
+    case model of
+        Struc rec ->
+            Struc {rec | category = (respond msg rec.category), otherCategories = (update msg rec.otherCategories)}
+        Categories categories ->
+            Categories (List.map (respond msg) categories)
 
 respond : Msg -> Category -> Category
 respond msg cat =
@@ -69,17 +69,28 @@ type alias Option = {status: Bool, text: String}
 type alias Options = List Option
 type alias Category = {name: String, dropdownStatus: Bool, options: Options, text: String}
 
-categoryOne = Category "Overall" False options ""
-categoryTwo = Category "Category 1" False options ""
-categoryThree = Category "Category 2" False options ""
-categoryFour = Category "Category 3" False options ""
+categoryOverAll = Category "Overall" False options ""
+categoryOne = Category "Category 1" False options ""
+categoryTwo = Category "Category 2" False options ""
+categoryThree = Category "Category 3" False options ""
 
 options : Options
 options = List.map makeOption (List.range 1 10)
 makeOption : Int -> Option
 makeOption num = Option False ("Option " ++ (String.fromInt num))
 
-view model = div [class "level_1_container", onClick (ClickedOutside)] (List.map makeCategory model)
+-- view model = div [class "level_1_container", onClick (ClickedOutside)] (List.map makeCategory model)
+view model = div [class "level_1_container", onClick (ClickedOutside)] [createDivsFromModel model]
+
+
+createDivsFromModel : Model -> Html Msg
+createDivsFromModel model =
+    case model of
+        Struc rec ->
+            div [] [makeCategory rec.category, createDivsFromModel rec.otherCategories]
+        Categories categories ->
+            div [] (List.map makeCategory categories)
+
 
 makeCategory : Category -> Html Msg
 makeCategory category =
