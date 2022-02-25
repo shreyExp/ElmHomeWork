@@ -58,12 +58,6 @@ changeStateOfOption optionSelected option =
     else
         option
 
-makeText : Bool -> String
-makeText status =
-    if status then
-        ""
-    else
-        ""
 
 type alias Option = {status: Bool, text: String}
 type alias Options = List Option
@@ -80,24 +74,30 @@ makeOption : Int -> Option
 makeOption num = Option False ("Option " ++ (String.fromInt num))
 
 -- view model = div [class "level_1_container", onClick (ClickedOutside)] (List.map makeCategory model)
-view model = div [class "level_1_container", onClick (ClickedOutside)] [createDivsFromModel model]
+view model = div [class "level_1_container", onClick (ClickedOutside)] [createDivsFromModel 1000 model]
 
 
-createDivsFromModel : Model -> Html Msg
-createDivsFromModel model =
+createDivsFromModel : Int -> Model -> Html Msg
+createDivsFromModel height model =
     case model of
         Struc rec ->
-            div [] [makeCategory rec.category, createDivsFromModel rec.otherCategories]
+            div (divStyle height) [makeCategory (height//2) rec.category, createDivsFromModel (height//2) rec.otherCategories]
         Categories categories ->
-            div [] (List.map makeCategory categories)
+            div (divStyle height) (List.map (makeBottomCategory (height)) categories)
 
 
-makeCategory : Category -> Html Msg
-makeCategory category =
-        div divStyle [
+makeCategory : Int -> Category -> Html Msg
+makeCategory height category =
+        div (divStyle height) [
                         contentSection category
                         ,optionsSection category
                      ]
+makeBottomCategory : Int -> Category -> Html Msg
+makeBottomCategory height category =
+    div (lowerDivStyle  height) [
+         contentSection category
+         ,optionsSection category
+        ]
 
 contentSection : Category -> Html Msg
 contentSection category =
@@ -153,19 +153,22 @@ optionColor status =
     else
         style "background-color" "white"
 
-divStyle = [border_style, height_style, displayGrid_style, roundBorder_style]
+divStyle height = [border_style, (height_style height), displayGrid_style, roundBorder_style]
+lowerDivStyle height = [margin_style, half_width_style, border_style, (height_style height), inline_style, roundBorder_style]
 
 displayGrid_style = style "display" "grid | inline-grid"
 roundBorder_style = style "border-radius" "20px"
 
 margin_bottom_style = style "margin-bottom" "30px"
-margin_style = style "margin" "10px"
+margin_style = style "margin" "5px"
 border_style = style "border" "solid 1px"
-half_width_style = style "width" "49%"
+half_width_style = style "width" "49.5%"
 inline_style = style "display" "inline-block"
 red_style = style "background-color" "blue"
 white_style = style "background-color" "white"
-height_style = style "height" "200px"
+height_style height =
+    style "height" ((String.fromInt height) ++ "px")
+
 onTop_style = style "z-index" "10"
 relativePosition_style = style "position" "relative"
 dropdown_width_style = style "width" "100%"
